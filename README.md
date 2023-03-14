@@ -7,6 +7,7 @@ Docker Superset image - https://hub.docker.com/r/apache/superset
 For start run - ``docker compose up -d``
 
 
+## Only for doc - this is config with .env and docker compose file
 ```bash
 docker pull cubejs/cube:latest
 docker run -d -p 3000:3000 -p 4000:4000 \
@@ -21,7 +22,7 @@ docker run -d -p 3000:3000 -p 4000:4000 \
 ```
 
 
-## After run superset:
+## After run superset - set user and dashboard examples
 
 ```bash
 docker exec -it superset superset fab create-admin \
