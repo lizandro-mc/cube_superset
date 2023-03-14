@@ -1,0 +1,13 @@
+venv
+env
+.git
+.gitlab-ci.yml
+.dockerignore
+dist
+Dockerfile
+docker-compose.yml
+*.md
+.aws
+.env
+.cubestore
+schema

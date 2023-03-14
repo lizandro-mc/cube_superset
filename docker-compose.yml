@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  cube:
+    image: cubejs/cube:latest
+    container_name: cube
+    ports:
+      - 4000:4000
+      - 3000:3000
+    env_file: .env
+    volumes:
+      - .:/cube/conf
+
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    ports:
+      - 8080:8088
+    volumes:
+      - type: bind
+        source: ./superset_config.py
+        target: /app/pythonpath/superset_config.py
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: root
+      POSTGRES_DB:  semantic_layer
+    volumes:
+      - db:/var/lib/postgresql
+    ports:
+      - 54330:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
+  dbt:
+    container_name: dbt
+    build: .
+    image: dbt-dummy
+    volumes:
+      - ./:/usr/src/dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+volumes:
+  db:
+
+
+
