@@ -4,6 +4,9 @@ Docker Cube image - https://hub.docker.com/r/cubejs/cube
 Docker Superset image - https://hub.docker.com/r/apache/superset
 
 
+For start run - ``docker compose up -d``
+
+
 ```bash
 docker pull cubejs/cube:latest
 docker run -d -p 3000:3000 -p 4000:4000 \

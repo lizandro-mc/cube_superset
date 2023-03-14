@@ -1,0 +1,25 @@
+cubes:
+  - name: PgAm
+    sql: SELECT * FROM pg_catalog.pg_am
+      # preAggregations:
+      # Pre-Aggregations definitions go here
+      # Learn more here: https://cube.dev/docs/caching/pre-aggregations/getting-started
+    joins: []
+    measures:
+      - name: count
+        type: count
+        drillMembers: [oid, amname]
+    dimensions:
+      - name: oid
+        sql: oid
+        type: string
+      - name: amhandler
+        sql: amhandler
+        type: string
+      - name: amtype
+        sql: amtype
+        type: string
+      - name: amname
+        sql: amname
+        type: string
+    dataSource: default
