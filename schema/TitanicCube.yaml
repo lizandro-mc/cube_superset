@@ -1,0 +1,34 @@
+cubes:
+  - name: TitanicCube
+    sql: SELECT * FROM bi.titanic_cube
+      # preAggregations:
+      # Pre-Aggregations definitions go here
+      # Learn more here: https://cube.dev/docs/caching/pre-aggregations/getting-started
+    joins: []
+    measures:
+      - name: count
+        type: count
+        drillMembers: [name]
+    dimensions:
+      - name: age
+        sql: "{CUBE}.\"Age\""
+        type: string
+      - name: fare
+        sql: "{CUBE}.\"Fare\""
+        type: string
+      - name: sex
+        sql: "{CUBE}.\"Sex\""
+        type: string
+      - name: cabin
+        sql: "{CUBE}.\"Cabin\""
+        type: string
+      - name: embarked
+        sql: "{CUBE}.\"Embarked\""
+        type: string
+      - name: ticket
+        sql: "{CUBE}.\"Ticket\""
+        type: string
+      - name: name
+        sql: "{CUBE}.\"Name\""
+        type: string
+    dataSource: default

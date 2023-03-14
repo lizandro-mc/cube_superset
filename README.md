@@ -57,3 +57,5 @@ Login and take a look -- navigate to http://localhost:8080/login/ -- u/p: [admin
 
 # Integration Cube with Postgres data warehouse 
 
+1. Create schema ``bi`` in semantic_layer db with postgres
+2. Import ``titanic_cube.csv`` to bi schema
