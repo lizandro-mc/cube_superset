@@ -1,7 +1,7 @@
 # Test Cube integration with Superset
 
-Docker Cube image - https://hub.docker.com/r/cubejs/cube
-Docker Superset image - https://hub.docker.com/r/apache/superset
+- Docker Cube image - https://hub.docker.com/r/cubejs/cube
+- Docker Superset image - https://hub.docker.com/r/apache/superset
 
 
 For start run - ``docker compose up -d``
