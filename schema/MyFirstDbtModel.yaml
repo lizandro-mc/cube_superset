@@ -1,0 +1,17 @@
+cubes:
+  - name: MyFirstDbtModel
+    sql: SELECT * FROM public.my_first_dbt_model
+      # preAggregations:
+      # Pre-Aggregations definitions go here
+      # Learn more here: https://cube.dev/docs/caching/pre-aggregations/getting-started
+    joins: []
+    measures:
+      - name: count
+        type: count
+        drillMembers: [id]
+    dimensions:
+      - name: id
+        sql: id
+        type: number
+        primaryKey: true
+    dataSource: default

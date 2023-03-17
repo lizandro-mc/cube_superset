@@ -16,19 +16,19 @@ cubes:
       - name: fare
         sql: "{CUBE}.\"Fare\""
         type: string
+      - name: name
+        sql: "{CUBE}.\"Name\""
+        type: string
       - name: sex
         sql: "{CUBE}.\"Sex\""
+        type: string
+      - name: ticket
+        sql: "{CUBE}.\"Ticket\""
         type: string
       - name: cabin
         sql: "{CUBE}.\"Cabin\""
         type: string
       - name: embarked
         sql: "{CUBE}.\"Embarked\""
-        type: string
-      - name: ticket
-        sql: "{CUBE}.\"Ticket\""
-        type: string
-      - name: name
-        sql: "{CUBE}.\"Name\""
         type: string
     dataSource: default
