@@ -97,3 +97,10 @@ services:
       - type: bind
         source: ./superset_config.py
         target: /app/pythonpath/superset_config.py
+  nginx:
+    image: nginx
+    ports:
+      - 443:443
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./ssl:/etc/ssl/private
