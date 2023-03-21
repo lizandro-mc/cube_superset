@@ -13,6 +13,9 @@ services:
       - CUBEJS_CUBESTORE_HOST=cubestore_router
       - CUBEJS_DB_PORT=3307
       - CUBEJS_API_SECRET=secret
+      - CUBEJS_SQL_USER=root
+      - CUBEJS_SQL_PORT=3306
+      - CUBEJS_SQL_PASSWORD=secret
     volumes:
       - .:/cube/conf
     depends_on:
