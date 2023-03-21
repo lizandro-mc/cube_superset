@@ -1,58 +1,86 @@
-version: '3.8'
+version: '2.2'
 
 services:
-  cube:
-    image: cubejs/cube:latest
-    container_name: cube
+  cube_api:
+    restart: always
+    image: cubejs/cube:v0.32.11
     ports:
       - 4000:4000
-      - 3000:3000
-      - 3306:3306
-    env_file: .env
+    environment:
+      - CUBEJS_DB_TYPE=mongobi
+      - CUBEJS_DB_EXPORT_BUCKET=cubestore
+      - CUBEJS_DB_HOST=mongodb-bi-connector
+      - CUBEJS_CUBESTORE_HOST=cubestore_router
+      - CUBEJS_DB_PORT=3307
+      - CUBEJS_API_SECRET=secret
+    volumes:
+      - .:/cube/conf
+    depends_on:
+      - cube_refresh_worker
+      - cubestore_router
+      - cubestore_worker_1
+      - cubestore_worker_2
+
+  cube_refresh_worker:
+    restart: always
+    image: cubejs/cube:v0.32.11
+    environment:
+      - CUBEJS_DB_TYPE=mongobi
+      - CUBEJS_DB_HOST=mongodb-bi-connector
+      - CUBEJS_DB_EXPORT_BUCKET=cubestore
+      - CUBEJS_DB_PORT=3307
+      - CUBEJS_CUBESTORE_HOST=cubestore_router
+      - CUBEJS_API_SECRET=secret
+      - CUBEJS_REFRESH_WORKER=true
     volumes:
       - .:/cube/conf
 
-  superset:
-    image: apache/superset:latest
-    container_name: superset
-    ports:
-      - 8080:8088
-    volumes:
-      - type: bind
-        source: ./superset_config.py
-        target: /app/pythonpath/superset_config.py
-
-  postgres:
-    image: postgres:latest
-    container_name: postgres
+  cubestore_router:
     restart: always
+    image: cubejs/cubestore:v0.32.11
     environment:
-      POSTGRES_PASSWORD: secret
-      POSTGRES_USER: root
-      POSTGRES_DB:  semantic_layer
+      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
+      - CUBESTORE_REMOTE_DIR=/cube/data
+      - CUBESTORE_META_PORT=9999
+      - CUBESTORE_SERVER_NAME=cubestore_router:9999
     volumes:
-      - db:/var/lib/postgresql
-    ports:
-      - 54330:5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p 5432"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      
-  dbt:
-    container_name: dbt
-    build: .
-    image: dbt-dummy
+      - .cubestore:/cube/data
+
+  cubestore_worker_1:
+    restart: always
+    image: cubejs/cubestore:v0.32.11
+    environment:
+      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
+      - CUBESTORE_SERVER_NAME=cubestore_worker_1:10001
+      - CUBESTORE_WORKER_PORT=10001
+      - CUBESTORE_REMOTE_DIR=/cube/data
+      - CUBESTORE_META_ADDR=cubestore_router:9999
     volumes:
-      - ./:/usr/src/dbt
+      - .cubestore:/cube/data
     depends_on:
-      postgres:
-        condition: service_healthy
+      - cubestore_router
 
+  cubestore_worker_2:
+    restart: always
+    image: cubejs/cubestore:v0.32.11
+    environment:
+      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
+      - CUBESTORE_SERVER_NAME=cubestore_worker_2:10002
+      - CUBESTORE_WORKER_PORT=10002
+      - CUBESTORE_REMOTE_DIR=/cube/data
+      - CUBESTORE_META_ADDR=cubestore_router:9999
+    volumes:
+      - .cubestore:/cube/data
+    depends_on:
+      - cubestore_router
 
-volumes:
-  db:
+  mongodb:
+    image: mongo:bionic
 
-
-
+  
+  mongodb-bi-connector:
+    image: dulanic/mongodb-bi-connector:latest
+    environment:
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017  
+      SCHEMA_REFRESH: 60
