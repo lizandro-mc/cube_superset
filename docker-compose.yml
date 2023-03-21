@@ -84,3 +84,13 @@ services:
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017  
       SCHEMA_REFRESH: 60
+
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    ports:
+      - 8080:8088
+    volumes:
+      - type: bind
+        source: ./superset_config.py
+        target: /app/pythonpath/superset_config.py
