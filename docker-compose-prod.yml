@@ -16,6 +16,7 @@ services:
       - CUBEJS_SQL_USER=root
       - CUBEJS_SQL_PORT=3306
       - CUBEJS_SQL_PASSWORD=secret
+      
     volumes:
       - .:/cube/conf
     depends_on:
