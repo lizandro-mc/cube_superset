@@ -1,106 +1,48 @@
 version: '2.2'
-
 services:
-  cube_api:
-    restart: always
-    image: cubejs/cube:v0.32.11
+  cube:
+    image: cubejs/cube:latest
     ports:
-      - 4000:4000
+      - 4000:4000  # Cube.js API and Developer Playground
+      - 3000:3000  # Dashboard app, if created
     environment:
-      - CUBEJS_DB_TYPE=mongobi
-      - CUBEJS_DB_EXPORT_BUCKET=cubestore
-      - CUBEJS_DB_HOST=mongodb-bi-connector
-      - CUBEJS_CUBESTORE_HOST=cubestore_router
-      - CUBEJS_DB_PORT=3307
-      - CUBEJS_API_SECRET=secret
-      - CUBEJS_SQL_USER=root
-      - CUBEJS_SQL_PORT=3306
-      - CUBEJS_SQL_PASSWORD=secret
+      CUBEJS_DB_TYPE: mongobi
+      CUBEJS_DB_HOST: mongobi
+      CUBEJS_DB_NAME: test-clinic
+      CUBEJS_DB_PORT: 3307
+      CUBEJS_DB_USER: root
+      CUBEJS_DB_PASS: secret
+      CUBEJS_DEV_MODE: true
+      CUBEJS_EXTERNAL_DEFAULT: true
+      CUBEJS_WEB_SOCKETS: true
+      CUBEJS_API_SECRET: secret
+      CUBEJS_SQL_USER: root
+      CUBEJS_SQL_PASSWORD: secret
+      CUBEJS_SQL_PORT: 3306
     volumes:
       - .:/cube/conf
-    depends_on:
-      - cube_refresh_worker
-      - cubestore_router
-      - cubestore_worker_1
-      - cubestore_worker_2
-
-  cube_refresh_worker:
-    restart: always
-    image: cubejs/cube:v0.32.11
-    environment:
-      - CUBEJS_DB_TYPE=mongobi
-      - CUBEJS_DB_HOST=mongodb-bi-connector
-      - CUBEJS_DB_EXPORT_BUCKET=cubestore
-      - CUBEJS_DB_PORT=3307
-      - CUBEJS_CUBESTORE_HOST=cubestore_router
-      - CUBEJS_API_SECRET=secret
-      - CUBEJS_REFRESH_WORKER=true
-    volumes:
-      - .:/cube/conf
-
-  cubestore_router:
-    restart: always
-    image: cubejs/cubestore:v0.32.11
-    environment:
-      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
-      - CUBESTORE_REMOTE_DIR=/cube/data
-      - CUBESTORE_META_PORT=9999
-      - CUBESTORE_SERVER_NAME=cubestore_router:9999
-    volumes:
-      - .cubestore:/cube/data
-
-  cubestore_worker_1:
-    restart: always
-    image: cubejs/cubestore:v0.32.11
-    environment:
-      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
-      - CUBESTORE_SERVER_NAME=cubestore_worker_1:10001
-      - CUBESTORE_WORKER_PORT=10001
-      - CUBESTORE_REMOTE_DIR=/cube/data
-      - CUBESTORE_META_ADDR=cubestore_router:9999
-    volumes:
-      - .cubestore:/cube/data
-    depends_on:
-      - cubestore_router
-
-  cubestore_worker_2:
-    restart: always
-    image: cubejs/cubestore:v0.32.11
-    environment:
-      - CUBESTORE_WORKERS=cubestore_worker_1:10001,cubestore_worker_2:10002
-      - CUBESTORE_SERVER_NAME=cubestore_worker_2:10002
-      - CUBESTORE_WORKER_PORT=10002
-      - CUBESTORE_REMOTE_DIR=/cube/data
-      - CUBESTORE_META_ADDR=cubestore_router:9999
-    volumes:
-      - .cubestore:/cube/data
-    depends_on:
-      - cubestore_router
-
   mongodb:
-    image: mongo:bionic
-
-  
-  mongodb-bi-connector:
-    image: dulanic/mongodb-bi-connector:latest
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017  
+      SCHEMA_REFRESH: 60
+  mongobi:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./superset
+    container_name: mongobi
     environment:
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017  
       SCHEMA_REFRESH: 60
 
   superset:
-    image: apache/superset:latest
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./superset
     container_name: superset
     ports:
       - 8080:8088
-    volumes:
-      - type: bind
-        source: ./superset_config.py
-        target: /app/pythonpath/superset_config.py
-  nginx:
-    image: nginx
-    ports:
-      - 443:443
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./ssl:/etc/ssl/private
+   
